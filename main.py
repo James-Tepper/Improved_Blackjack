@@ -24,30 +24,13 @@ class Player:
             if card.index == "Ace":
                 aces += 1
 
-        while True:
+        while self.still_in:
             if total <= 21:
                 self.total_sum = total
                 return (f"TOTAL SUM: {self.total_sum}")
             else:
                 Player.check_for_aces(self, total, aces)
 
-    def get_total_sum_no_print(self):
-        '''
-        calculates total sum of player's hand
-        '''
-        total = 0
-        aces = 0
-        for card in self.hand:
-            total += card.value
-            if card.index == "Ace":
-                aces += 1
-
-        while True:
-            if total <= 21:
-                self.total_sum = total
-                return
-            else:
-                Player.check_for_aces(self, total, aces)
 
     def check_for_aces(self, total, aces):
         '''
@@ -63,14 +46,34 @@ class Player:
             self.still_in = False
             return
 
+
     def print_cards(self):
         total = 0
         print(f"{self.name}'s CARDS")
         for card in self.hand:
-            print(f'''
-{card.index}: {card.value}''')
+            print(f"{card.index} Of {card.suit}: {card.value}")
             total += card.value
         print(f"TOTAL SUM: {total}")
+
+
+    def get_total_sum_no_print(self):
+        '''
+        calculates total sum of player's hand
+        '''
+        total = 0
+        aces = 0
+        for card in self.hand:
+            total += card.value
+            if card.index == "Ace":
+                aces += 1
+
+        while self.still_in:
+            if total <= 21:
+                self.total_sum = total
+                return
+            else:
+                Player.check_for_aces(self, total, aces)
+
 
 
 class Card:
@@ -138,16 +141,17 @@ Is "{name}" correct? [Y/N]\n''').upper()
 
 def bets(players: list[Player]):
     for player in players:
-        while True:
-            bet = int(input(f'''
-{player.name}, place your bet.
-[Minimum bet amount is 10]\n'''))
-            if 10 <= bet <= player.chips:
-                player.bets = bet
-                player.chips -= bet
-                break
-            print("INVALID AMOUNT")
-            continue
+        if player.chips >= 10:
+            while True:
+                bet = int(input(f'''
+    {player.name}, place your bet.
+    [Minimum bet amount is 10]\n'''))
+                if 10 <= bet <= player.chips:
+                    player.bets = bet
+                    player.chips -= bet
+                    break
+                print("INVALID AMOUNT")
+                continue
 
 
 def draw_cards(players: list[Player], dealer: Player):
@@ -233,27 +237,36 @@ def players_vs_dealer(players: list[Player], dealer: Player):
         print(f'''The {dealer.name} draws a {card.index} or {card.suit}''')
         Player.get_total_sum_no_print(dealer)
 
-    for player in players:
-        if player.still_in:
-            if player.total_sum == dealer.total_sum:
+    if not dealer.still_in: 
+        for player in players:
+            if player.still_in:
                 print(f'''
+    {dealer.name} has busted!
+    {player.name} has WON {player.bets * 2}''')
+                player.chips += player.bets * 2
+
+    else:
+        for player in players:
+            if player.still_in:
+                if player.total_sum == dealer.total_sum:
+                    print(f'''
 {player.name}'s Total: {player.total_sum}
 {dealer.name}'s Total: {dealer.total_sum}
 {player.name} has TIED the {dealer.name}!''')
-                player.chips += player.bets
-                player.still_in = False
-            elif player.total_sum > dealer.total_sum:
-                print(f'''
+                    player.chips += player.bets
+                    player.still_in = False
+                elif player.total_sum > dealer.total_sum:
+                    print(f'''
 {player.name}'s Total: {player.total_sum}
 {dealer.name}'s Total: {dealer.total_sum}
 {player.name} has WON {player.bets * 2}!''')
-                player.chips += player.bets * 2
-            else:
-                print(f'''
+                    player.chips += player.bets * 2
+                else:
+                    print(f'''
 {player.name}'s Total: {player.total_sum}
 {dealer.name}'s Total: {dealer.total_sum}
 {player.name} has LOST!''')
-        player.still_in = False
+            player.still_in = False
 
 
 def results(players: list[Player]):
