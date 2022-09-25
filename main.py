@@ -11,7 +11,6 @@ class Player:
         self.hand: list[Card] = []
         self.still_in: bool = True
 
-            
     def get_total_sum(self):
         '''
         calculates total sum of player's hand
@@ -32,7 +31,6 @@ class Player:
             else:
                 Player.check_for_aces(self, total, aces)
 
-
     def check_for_aces(self, total, aces):
         '''
         checks if player has aces in hand prior to busting
@@ -47,7 +45,6 @@ class Player:
             self.still_in = False
             return
 
-
     def print_cards(self):
         total = 0
         print(f"{self.name}'s CARDS")
@@ -55,7 +52,6 @@ class Player:
             print(f"{card.index} Of {card.suit}: {card.value}")
             total += card.value
         print(f"TOTAL SUM: {total}")
-
 
     def get_total_sum_no_print(self):
         '''
@@ -74,7 +70,6 @@ class Player:
                 return
             else:
                 Player.check_for_aces(self, total, aces)
-
 
 
 class Card:
@@ -145,8 +140,8 @@ def bets(players: list[Player]):
         if player.chips >= 10:
             while True:
                 bet = int(input(f'''
-    {player.name}, place your bet.
-    [Minimum bet amount is 10]\n'''))
+{player.name}, place your bet.
+[Minimum bet amount is 10]\n'''))
                 if 10 <= bet <= player.chips:
                     player.bets = bet
                     player.chips -= bet
@@ -203,10 +198,7 @@ PAYOUT: {player.bets * 3}''')
 
 def hit_or_stand(players: list[Player]):
     for player in players:
-        while True:
-            if not player.still_in:
-                break
-
+        while player.still_in:
             Player.print_cards(player)
             option = input(f'''
 {player.name}, would you like to HIT or STAND?\n''').upper()
@@ -220,7 +212,7 @@ def hit_or_stand(players: list[Player]):
                 player.hand.append(card)
                 print(f'''
 {player.name} has drawn a {card.index} of {card.suit}!''')
-                Player.get_total_sum(player)
+                Player.get_total_sum_no_print(player)
                 time.sleep(2)
                 continue
             else:  # STAND
@@ -238,7 +230,7 @@ def players_vs_dealer(players: list[Player], dealer: Player):
         print(f'''The {dealer.name} draws a {card.index} or {card.suit}''')
         Player.get_total_sum_no_print(dealer)
 
-    if not dealer.still_in: 
+    if not dealer.still_in:
         for player in players:
             if player.still_in:
                 print(f'''
