@@ -11,6 +11,7 @@ class Player:
         self.hand: list[Card] = []
         self.still_in: bool = True
 
+            
     def get_total_sum(self):
         '''
         calculates total sum of player's hand
